@@ -240,13 +240,15 @@ class EKF_SLAM:
         Fx = np.hstack((np.eye(self.STATE_SIZE), np.zeros(
             (self.STATE_SIZE, self.LM_SIZE * self.calc_n_LM(x)))))
 
-        jF = np.array([[0.0, 0.0, -self.DT * u[0,0] * np.sin(x[2, 0])],
-                    [0.0, 0.0, self.DT * u[0,0] * np.cos(x[2, 0])],
-                    [0.0, 0.0, 0.0]],dtype=float)
-        # print(-self.DT * u[0,0] * np.sin(x[2, 0]))
-        
+        jF = np.array([[0.0, 0.0, -self.DT * np.multiply(u[0,0], math.sin(x[2, 0]))],
+                   [0.0, 0.0, self.DT * u[0,0] * math.cos(x[2, 0])],
+                   [0.0, 0.0, 0.0]],dtype=float)
+        # print(jF)
+        #         
         # print(Fx.T @ jF @ Fx)
-        G = np.eye(self.STATE_SIZE) + Fx.T @ jF @ Fx
+        # print(Fx.shape)
+        # G = np.eye(self.STATE_SIZE) + Fx.T @ jF @ Fx
+        G = Fx.T @ jF @ Fx
         if self.calc_n_LM(x) > 0:
             print(Fx.shape)
         return G, Fx
