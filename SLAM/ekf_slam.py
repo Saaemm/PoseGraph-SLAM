@@ -3,7 +3,7 @@
 from typing import List, Tuple
 import numpy as np
 import math
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 class EKF_SLAM:
 
@@ -17,7 +17,6 @@ class EKF_SLAM:
         self.Qsim = np.diag([0.2, np.deg2rad(1.0)])**2  # Sensor Noise
         self.Rsim = np.diag([1.0, np.deg2rad(10.0)])**2 # Process Noise
 
-
         self.DT = 0.1  # time tick [s]
         self.SIM_TIME = 50.0  # simulation time [s]
         self.MAX_RANGE = 20.0  # maximum observation range
@@ -26,8 +25,6 @@ class EKF_SLAM:
         self.LM_SIZE = 2  # LM state size [x,y]
 
         self.show_animation = True
-
-        pass
 
     def ekf_slam(self, X, P, u, z) -> Tuple[np.ndarray, np.ndarray]:
         '''
@@ -243,14 +240,16 @@ class EKF_SLAM:
         Fx = np.hstack((np.eye(self.STATE_SIZE), np.zeros(
             (self.STATE_SIZE, self.LM_SIZE * self.calc_n_LM(x)))))
 
-        jF = np.array([[0.0, 0.0, -self.DT * u[0] * math.sin(x[2, 0])],
-                    [0.0, 0.0, self.DT * u[0] * math.cos(x[2, 0])],
-                    [0.0, 0.0, 0.0]],dtype=object)
-
+        jF = np.array([[0.0, 0.0, -self.DT * u[0,0] * np.sin(x[2, 0])],
+                    [0.0, 0.0, self.DT * u[0,0] * np.cos(x[2, 0])],
+                    [0.0, 0.0, 0.0]],dtype=float)
+        # print(-self.DT * u[0,0] * np.sin(x[2, 0]))
+        
+        # print(Fx.T @ jF @ Fx)
         G = np.eye(self.STATE_SIZE) + Fx.T @ jF @ Fx
         if self.calc_n_LM(x) > 0:
             print(Fx.shape)
-        return G, Fx,
+        return G, Fx
 
 
     def calc_LM_Pos(self, x, z):
